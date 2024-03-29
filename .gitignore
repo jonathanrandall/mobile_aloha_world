@@ -1,3 +1,25 @@
+*.vscode*
+*.vscode/*
+*ssid*
+sim_ws/build/*
+sim_ws/install/*
+sim_ws/log/*
+xarm_gui/**
+episodes/**
+contol_ws/build/**
+contol_ws/log/**
+contol_ws/install/**
+*__pycache__*
+*/__pycache__/**
+ckpt_dir/**
+ckpt_dir*/**
+ckpt_dir*
+instructables*
+sim_ws*
+read_controller*
+tmp*
+*tmp*
+*.pio*
 # Prerequisites
 *.d
 
