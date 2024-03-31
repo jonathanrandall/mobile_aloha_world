@@ -147,7 +147,11 @@ void robot_move(long *enc){
   update_speed();
 
   while ((counter1+counter2) < (l1 + r1)){
-    robot_fwd();
+    if (enc[2]){
+      robot_fwd();
+    } else {
+      robot_back();
+    }
   }
   reset_wheel_encoder_data();
 

@@ -25,9 +25,13 @@ setup(
         'console_scripts': [
             'master = xarm_pubsub.master_publisher:main',
             'puppet = xarm_pubsub.puppet_subscriber:main',
+            'base_master = xarm_pubsub.base_master_publisher:main',
+            'base_puppet = xarm_pubsub.base_puppet_subscriber:main',
             'record_gui = xarm_pubsub.record_gui:main',
             'image_pub = xarm_pubsub.camera_publisher:main',
             'image_sub = xarm_pubsub.camera_subscriber:main',
+            'base_image_pub = xarm_pubsub.base_camera_publisher:main',
+            'base_image_sub = xarm_pubsub.base_camera_subscriber:main',
         ],
     },
 )

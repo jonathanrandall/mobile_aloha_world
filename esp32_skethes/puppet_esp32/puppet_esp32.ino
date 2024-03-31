@@ -21,24 +21,29 @@ void setup(){
 
   delay(200);
 
+  /****
+  **** I only need these two if testing the robot without the ros2. 
+  **** So, only if using the two chassis together, where the master is like a remote control
   xTaskCreatePinnedToCore(
-       robot_move_loop, /* Function to implement the task */
-       "rml",    /* Name of the task */
-       1024*8,            /* Stack size in words */
-       NULL,            /* Task input parameter */
-       2,               /* Priority of the task */
-       NULL,     /* Task handle. */
-       1);              /* Core where the task should run */
+       robot_move_loop, // Function to implement the task 
+       "rml",    // Name of the task 
+       1024*8,            // Stack size in words 
+       NULL,            // Task input parameter 
+       2,               // Priority of the task 
+       NULL,     // Task handle. 
+       1);              // Core where the task should run 
   
   xTaskCreatePinnedToCore(
-       http_get_loop, /* Function to implement the task */
-       "ghl",    /* Name of the task */
-       1024*8,            /* Stack size in words */
-       NULL,            /* Task input parameter */
-       2,               /* Priority of the task */
-       NULL,     /* Task handle. */
-       1);              /* Core where the task should run */
+       http_get_loop, // Function to implement the task 
+       "ghl",    // Name of the task 
+       1024*8,            // Stack size in words 
+       NULL,            // Task input parameter 
+       2,               // Priority of the task 
+       NULL,     // Task handle. 
+       1);              // Core where the task should run 
+  */
   /*
+  //this is for testing the code after flashing.
   update_speed();
   robot_fwd();
   delay(2000);

@@ -20,6 +20,13 @@ def generate_launch_description():
         remappings=[('/joint_states', '/right/joint_states')]
     )
 
+    node_robot_base_publisher = Node(
+        package='xarm_pubsub',
+        executable='base_master',
+        name='base_master',#'master',
+        # remappings=[('/joint_states', '/right/joint_states')]
+    )
+
     node_robot_subscriber = Node(
         package='xarm_pubsub',
         executable='puppet',
@@ -45,6 +52,14 @@ def generate_launch_description():
         # parameters=[{'topic_name': '/right/joint_states'}]
     )
 
+    node_robot_base_image_pub = Node(
+        package='xarm_pubsub',
+        executable='base_image_pub',
+        name='base_image_pub',
+        # remappings=[('/joint_states', '/right/joint_states')]
+        # parameters=[{'topic_name': '/right/joint_states'}]
+    )
+
     node_robot_image_sub = Node(
         package='xarm_pubsub',
         executable='image_sub',
@@ -61,6 +76,8 @@ def generate_launch_description():
 
         node_robot_state_publisher,
         node_robot_image_pub,
+        node_robot_base_publisher,
+        node_robot_base_image_pub,
         # node_robot_image_sub,
         node_robot_subscriber_gui,
         # node_robot_image_pub

@@ -27,8 +27,10 @@ from python_qt_binding.QtWidgets import QLabel
 from python_qt_binding.QtGui import QPixmap, QImage
 from python_qt_binding.QtCore import QTimer
 
-from .puppet_subscriber import MinimalSubscriber
-from .camera_subscriber import CameraSubscriber
+from .puppet_subscriber import MinimalSubscriber #ps
+from .camera_subscriber import CameraSubscriber #cs
+from .base_camera_subscriber import BaseCameraSubscriber #bcs
+from .base_puppet_subsriber import BaseSubscriber #ms
 
 #need this or else opencv doesn't work with PyQt5
 import os
@@ -36,7 +38,7 @@ os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/usr/lib/x86_64-linux-gnu/qt5/plugi
 
 
 class puppet_gui(QMainWindow):
-    def __init__(self, title, ps, cs):
+    def __init__(self, title, ps,ms, cs, bcs):
         super(puppet_gui, self).__init__()
         self.setWindowTitle(title)
 
@@ -74,16 +76,24 @@ class puppet_gui(QMainWindow):
 
         # self.thread_gui = threading.Thread(target=self.root.mainloop(), daemon=False)
         self.ps=ps #puppet subscriber
+        self.ms=ms #puppet subscriber
         self.cs = cs #camera subsriber
+        self.bcs = bcs #base camera suscriber
 
         self.puppet_data = ps.data_dict
         self.image_data = cs.data_dict
+        self.mobile = ms.data_dict
+        self.base_image_data = bcs.data_dict
+
+
         
         self.strt_ep = False
         self.stp_ep = False
 
         self.record_params = ps.record_params
         self.record_paramscs = cs.record_params
+        self.record_paramsms = ms.record_params
+        self.record_paramsbcs = bcs.record_params
 
         self.running = True
 
@@ -94,6 +104,10 @@ class puppet_gui(QMainWindow):
         self.record_params["start"] = False
         self.record_paramscs["stop"]=True
         self.record_paramscs["start"] = False
+        self.record_paramsms["stop"]=True
+        self.record_paramsms["start"] = False
+        self.record_paramsbcs["stop"]=True
+        self.record_paramsbcs["start"] = False
         time.sleep(0.1)
         self.record_episode()
         
@@ -101,6 +115,8 @@ class puppet_gui(QMainWindow):
     def start_episode(self):
         self.record_params["start"] = True
         self.record_paramscs["start"] = True
+        self.record_paramsms["start"] = True
+        self.record_paramsbcs["start"] = True
         
 
     def closeEvent(self, event):
@@ -117,11 +133,21 @@ class puppet_gui(QMainWindow):
     def loopcs(self):
         while self.running:
             rclpy.spin_once(self.cs, timeout_sec=0.1)
+
+    def loopbcs(self):
+        while self.running:
+            rclpy.spin_once(self.bcs, timeout_sec=0.1)
+
+    def loopms(self):
+        while self.running:
+            rclpy.spin_once(self.ms, timeout_sec=0.1)
             
     def spin_nodes(self):
         executor = MultiThreadedExecutor()
+        executor.add_node(self.ms)
         executor.add_node(self.ps)
-        executor.add_node(self.cs)
+        executor.add_node(self.cs)        
+        executor.add_node(self.bcs)
         executor.spin()
 
     def update_frame(self):
@@ -156,24 +182,39 @@ class puppet_gui(QMainWindow):
             obs = root.create_group('observations')
             image = obs.create_group('images')
             l1 = len(self.cs.data_dict['/observations/images/top'])
+            l1 = len(self.bcs.data_dict['/observations/images/base'])
             la = len(self.ps.data_dict['/action'])
+            lb = len(self.ms.data_dict['/base_action'])
+            le = len(self.ms.data_dict['/observations/encoder_pos'])
             lq = len(self.ps.data_dict['/observations/qpos'])
             _ = image.create_dataset('top', (l1, 480, 640, 3), dtype='uint8', 
                                      chunks=(1,480,640,3), )
+            _ = image.create_dataset('base', (l1, 480, 640, 3), dtype='uint8', 
+                                     chunks=(1,480,640,3), )
             _ = obs.create_dataset('qpos', (lq, 6))
+            _ = obs.create_dataset('encodere_pos', (le, 2))
             # _ = obs.create_dataset('qvel', (max_timesteps, 14))
             # _ = obs.create_dataset('effort', (max_timesteps, 14))
             _ = root.create_dataset('action', (la, 6))
+            _ = root.create_dataset('base_action', (lb, 2))
 
             for name, array in self.ps.data_dict.items():
                 root[name][...] = array
             for name, array in self.cs.data_dict.items():
+                root[name][...] = array
+            for name, array in self.ms.data_dict.items():
+                root[name][...] = array
+            for name, array in self.bcs.data_dict.items():
                 root[name][...] = array
 
             #next clear the dictionary for next use.
             for key in self.ps.data_dict:
                 self.ps.data_dict[key] = []
             for key in self.cs.data_dict:
+                self.cs.data_dict[key] = []
+            for key in self.ms.data_dict:
+                self.ps.data_dict[key] = []
+            for key in self.bcs.data_dict:
                 self.cs.data_dict[key] = []
         # print(f'Saving: {time.time() - t0:.1f} secs')
 
@@ -197,7 +238,9 @@ def main():
     app = QApplication(sys.argv)
     jsp_gui = puppet_gui('Episode Recorder',
                                     MinimalSubscriber(), 
-                                    CameraSubscriber()
+                                    BaseSubscriber(),
+                                    CameraSubscriber(),
+                                    BaseCameraSubscriber()
                                     )
 
     jsp_gui.show()

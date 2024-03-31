@@ -79,9 +79,9 @@ void handleRequest(AsyncWebServerRequest *request)
     long arg1, arg2;
 
     
-    long enc[2];
+    long enc[3];
    
-    sscanf(valValue.c_str(), "%d_%d", &enc[0], &enc[1]);
+    sscanf(valValue.c_str(), "%d_%d_%d", &enc[0], &enc[1], &enc[2]);
     
     
     reset_wheel_encoder_data();
