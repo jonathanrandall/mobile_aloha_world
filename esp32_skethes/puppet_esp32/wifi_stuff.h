@@ -74,12 +74,12 @@ void handleRequest(AsyncWebServerRequest *request)
     String valValue = request->arg("val");
     t_stop = millis();
     
-    int enc[4];
+    long enc[4];
 
 
     // Serial.println(valValue.c_str());
    
-    sscanf(valValue.c_str(), "%d_%d_%d_%d", &enc[0], &enc[1], &enc[2], &enc[3]);    
+    sscanf(valValue.c_str(), "%ld_%ld_%ld_%ld", &enc[0], &enc[1], &enc[2], &enc[3]);    
     
     
     reset_wheel_encoder_data();

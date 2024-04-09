@@ -17,7 +17,7 @@ void setup(){
   start_wheel_encoder();
 
   robot_setup();
-  cmd_queue = xQueueCreate(2, sizeof(cmd));
+  cmd_queue = xQueueCreate(5, sizeof(cmd));
 
   delay(200);
 

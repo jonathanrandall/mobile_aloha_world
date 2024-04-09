@@ -187,7 +187,7 @@ void robot_move(long *enc){
 
 void robot_move_loop(void *params){
   int spd_prev=0;
-  int rec_cmd[4];
+  long rec_cmd[4];
 
   while(true){
     if (spd_prev!=motor_speed){
