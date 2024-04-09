@@ -5,7 +5,7 @@ import time
 import cv2
 import numpy as np
 
-data_dir = "/home/jonny/projects/aloha_world/episodes/wave_hello"
+data_dir = "/home/jonny/projects/mobile_aloha_world/episodes/task1"
 
 class ReplayEpisodes:
     def __init__(self, data_dir):
@@ -84,7 +84,7 @@ class ReplayEpisodes:
 
 def main(args=None):
     re = ReplayEpisodes(data_dir=data_dir)
-    re.play_episode(25)
+    re.play_episode(1)
     # for i in range(0,12):
     #     re.play_episode(i*3)
 

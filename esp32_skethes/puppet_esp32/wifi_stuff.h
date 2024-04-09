@@ -22,7 +22,7 @@ const char* serverEncoder = "http://192.168.1.211/get_encoders";
 // const char *password = "";
 
 #define AUTO_STOP_INTERVAL 2000
-unsigned long lastMotorCommand;
+unsigned long t_stop;
 
 /// Added static IP
 // Set your Static IP address
@@ -67,32 +67,33 @@ void init_wifi()
 
 void handleRequest(AsyncWebServerRequest *request)
 {    
-    ///get_encoders
-    long tmp1, tmp2;
-    tmp1 = millis();
+    
     /// set_encoders?var=variable&val=10
 
     String variable = request->arg("var");
     String valValue = request->arg("val");
-
-    // Parse the string into two integers
-    long arg1, arg2;
-
+    t_stop = millis();
     
-    long enc[3];
+    int enc[4];
+
+
+    // Serial.println(valValue.c_str());
    
-    sscanf(valValue.c_str(), "%d_%d_%d", &enc[0], &enc[1], &enc[2]);
+    sscanf(valValue.c_str(), "%d_%d_%d_%d", &enc[0], &enc[1], &enc[2], &enc[3]);    
     
     
     reset_wheel_encoder_data();
+
+    if (enc[2] && enc[3]){
+      robot_stop();
+    } else {
+        xQueueSend(cmd_queue, &enc, pdMS_TO_TICKS(10));
+    }
+    // robot_move(enc);
     
-    robot_move(enc);
-
-
-
     String resp;
-
-    resp = "message recieved";
+    if(actstate==2) robot_stop();
+    resp = valValue+"_"+String(counter1)+"_"+String(counter2)+"_" + String(actstate);
 
     request->send(200, "text/plain", resp);
 

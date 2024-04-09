@@ -86,11 +86,14 @@ class BaseCameraSubscriber(Node):
         
         # self.get_logger().warning(f'Receiving RGB frame {self.current_frame.shape}')
         self.current_frame = self.br_rgb.imgmsg_to_cv2(data)
+        # fr_sz = '_'.join(str(pos) for pos in self.current_frame.shape)
+        
         # image_queue.put(self.current_frame)
         # self.current_frame = np.array(self.current_frame).astype(np.uint8)
         # cv2.imshow("RGB", self.current_frame)
         if self.record_params["start"]:
-            self.data_dict['/observations/images/base'].append(self.current_frame)
+            # self.get_logger().info(fr_sz)
+            self.data_dict['/observations/images/base'].append(self.current_frame.copy())
         # cv2.waitKey(1)
         
 

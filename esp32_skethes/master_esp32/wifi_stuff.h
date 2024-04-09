@@ -18,6 +18,7 @@
 unsigned long lastMotorCommand;
 
 #define button_pin 25
+#define button_pin2 26
 
 /// Added static IP
 // Set your Static IP address
@@ -32,7 +33,7 @@ IPAddress secondaryDNS(8, 8, 4, 4); // optional
 AsyncWebServer server(80);
 void handleRequest(AsyncWebServerRequest *request);
 
-int fwd_back;
+int fwd_back, fwd_back2;
 
 void init_wifi()
 {
@@ -63,9 +64,10 @@ void handleRequest(AsyncWebServerRequest *request)
 {    
     
     fwd_back = (int) (0xFFFF & digitalRead(button_pin));
+    fwd_back2 = (int) (0xFFFF & digitalRead(button_pin2));
     ///get_encoders
     String resp;
-    resp = String(counter1) + " " + String(counter2) +" "+ String(fwd_back);
+    resp = String(counter1) + " " + String(counter2) +" "+ String(fwd_back) + " " + String(fwd_back2);
 
     request->send(200, "text/plain", resp);
 

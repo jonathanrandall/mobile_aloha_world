@@ -73,15 +73,23 @@ class BaseSubscriber(Node):
         self.encoder_pos = positions_int
 
         esp32_ip = self.esp32_ip
-        resp=requests.get(esp32_ip+f"/set_encoders?var=variable&val="+positions_str)
-        self.get_logger().info("Base subscriber positions: %s" %  positions_str)#', '.join(str(pos) for pos in positions_int))
+        try:
+            resp=requests.get(esp32_ip+f"/set_encoders?var=variable&val="+positions_str,timeout=2)
+        except requests.exceptions.Timeout:
+            self.get_logger().info("Timed out")
+            resp="error"
+            # exit()
+
+        # print(resp.status_code)
+        self.get_logger().info(resp.content)
+        # self.get_logger().info("Base subscriber positions: %s" %  positions_str)#', '.join(str(pos) for pos in positions_int))
         
         
         if self.record_params["start"]:
             self.max_timesteps=self.max_timesteps+1
-            self.data_dict['/observations/encoder_pos'].append(positions_int[:3])
+            self.data_dict['/observations/encoder_pos'].append(positions_int[:4])
             self.get_logger().info("Joint positions: %s" % ', '.join(str(pos) for pos in positions_int))
-            self.data_dict['/base_action'].append(positions_int[:3])
+            self.data_dict['/base_action'].append(positions_int[:4])
         if self.record_params["stop"]: #(t2-self.start_time > 20):
             # stp_ep = False
             # strt_ep = False

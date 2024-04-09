@@ -18,6 +18,8 @@ int lmI2 = 26; // L out2 = L | H out2 = H | H short break | L stop brown
 // int STDBY = 19; //Low is off (current save) //not connected so far
 
 
+bool robot_moving=false;
+
 int noStop = 0;
 
 //Setting Motor PWM properties
@@ -26,7 +28,7 @@ const int motorPWMChannnelA = 7;
 const int motorPWMChannnelB = 2;
 uint8_t lresolution = 8;
  
-uint8_t  motor_speed   = 120;
+uint8_t  motor_speed   = 100;
 volatile unsigned long previous_time = 0;
 volatile unsigned long move_interval = 250;
 
@@ -51,10 +53,10 @@ uint8_t robo = 0;
 
 void robot_stop()
 {
-  digitalWrite(lmI1,LOW);
-  digitalWrite(lmI2,LOW);
-  digitalWrite(rmI1,LOW);
-  digitalWrite(rmI2,LOW);
+  digitalWrite(lmI1,HIGH);
+  digitalWrite(lmI2,HIGH);
+  digitalWrite(rmI1,HIGH);
+  digitalWrite(rmI2,HIGH);
   actstate = stp;
 }
 
@@ -141,27 +143,51 @@ void robot_setup(){
 }
 
 void robot_move(long *enc){
-  long l1, r1;
-  l1 = enc[0];
-  r1 = enc[1];
+  robot_moving = true;
+  Serial.println("in robot moving");
+  unsigned int l1, r1;
+  l1 = (unsigned int) enc[0];
+  r1 = (unsigned int) enc[1];
   update_speed();
 
+  bool f1 = (bool) enc[2];
+  bool b1 = (bool) enc[3];
+
+  Serial.println(String(f1)+" "+String(b1));
+
   while ((counter1+counter2) < (l1 + r1)){
-    if (enc[2]){
+    Serial.println(counter1);
+    Serial.println(counter2);
+    Serial.println("l1");
+    Serial.println(String(l1) + " " + String(r1));
+    delay(100);
+    // counter1++;
+    if (!f1){
+      Serial.println("moving fwsd");
       robot_fwd();
-    } else {
-      robot_back();
+    } 
+    else { 
+      // if (!b1) 
+      // {
+        robot_back();
+      // }
     }
   }
+  delay(1);
+  Serial.println("still in robot moving0");
+  robot_stop();
+  delay(1);
+  Serial.println("still in robot moving");
   reset_wheel_encoder_data();
 
-  robot_stop();
+  
+  robot_moving=false;
   
 }
 
 void robot_move_loop(void *params){
   int spd_prev=0;
-  long rec_cmd[3];
+  int rec_cmd[4];
 
   while(true){
     if (spd_prev!=motor_speed){
@@ -170,13 +196,17 @@ void robot_move_loop(void *params){
     }
 
     if(xQueueReceive(cmd_queue, &rec_cmd, pdMS_TO_TICKS(1))== pdTRUE) {
+      
       while ((counter1+counter2) < (rec_cmd[0] + rec_cmd[1])){     
-        if(rec_cmd[2]){
+        if(!rec_cmd[2]){
               robot_fwd();
-        } else {  //move in reverse
+        } else if(!rec_cmd[3]){  //move in reverse
           robot_back();
+        } else {
+          break;
         }
       }
+      robot_stop();
     } else{
       robot_stop();
       reset_wheel_encoder_data();

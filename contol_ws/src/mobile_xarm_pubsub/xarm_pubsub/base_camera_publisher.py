@@ -29,6 +29,10 @@ from cv_bridge import CvBridge
 import subprocess
 
 from collections import deque
+try:
+  from .my_vars import timer_period
+except:
+  from my_vars import timer_period
 
 class VideoCapture:
 
@@ -67,7 +71,7 @@ class BaseCameraPublisher(Node):
         URL_cam = "http://192.168.1.181"
         self.cap_esp32 = VideoCapture(URL_cam + ":81/stream")
         self.intel_publisher_rgb = self.create_publisher(Image, "base_rgb_frame", 10)
-        timer_period = 0.5  # seconds
+        # timer_period = 0.5  # seconds
         self.br_rgb = CvBridge()
         self.timer = self.create_timer(timer_period, self.timer_callback)
         

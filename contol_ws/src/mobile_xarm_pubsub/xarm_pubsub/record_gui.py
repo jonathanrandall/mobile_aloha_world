@@ -31,7 +31,7 @@ from .puppet_subscriber import MinimalSubscriber #ps
 from .camera_subscriber import CameraSubscriber #cs
 from .base_camera_subscriber import BaseCameraSubscriber #bcs
 from .base_puppet_subsriber import BaseSubscriber #ms
-
+import logging
 #need this or else opencv doesn't work with PyQt5
 import os
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/usr/lib/x86_64-linux-gnu/qt5/plugins'
@@ -97,7 +97,10 @@ class puppet_gui(QMainWindow):
 
         self.running = True
 
-        self.dataset_path = '~/projects/aloha_world/episodes/wave_hello'#'~/tmp/my_episode'
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger('puppet_gui')
+
+        self.dataset_path = '~/projects/mobile_aloha_world/episodes/task1'#'~/tmp/my_episode'
 
     def stop_episode(self):
         self.record_params["stop"]=True
@@ -173,7 +176,7 @@ class puppet_gui(QMainWindow):
 
 
     def record_episode(self):
-        global dataset_path
+        
         file_path = os.path.expanduser(self.dataset_path)
         i = self.get_auto_index(file_path)
         file_path = os.path.join(file_path, f'episode_{i}.hdf5')
@@ -182,23 +185,25 @@ class puppet_gui(QMainWindow):
             obs = root.create_group('observations')
             image = obs.create_group('images')
             l1 = len(self.cs.data_dict['/observations/images/top'])
-            l1 = len(self.bcs.data_dict['/observations/images/base'])
+            l2 = len(self.bcs.data_dict['/observations/images/base'])
             la = len(self.ps.data_dict['/action'])
             lb = len(self.ms.data_dict['/base_action'])
             le = len(self.ms.data_dict['/observations/encoder_pos'])
             lq = len(self.ps.data_dict['/observations/qpos'])
             _ = image.create_dataset('top', (l1, 480, 640, 3), dtype='uint8', 
                                      chunks=(1,480,640,3), )
-            _ = image.create_dataset('base', (l1, 480, 640, 3), dtype='uint8', 
-                                     chunks=(1,480,640,3), )
+            _ = image.create_dataset('base', (l2, 240, 320, 3), dtype='uint8', 
+                                     chunks=(1,240,320,3), )
             _ = obs.create_dataset('qpos', (lq, 6))
-            _ = obs.create_dataset('encodere_pos', (le, 2))
+            _ = obs.create_dataset('encoder_pos', (le, 4))
             # _ = obs.create_dataset('qvel', (max_timesteps, 14))
             # _ = obs.create_dataset('effort', (max_timesteps, 14))
             _ = root.create_dataset('action', (la, 6))
-            _ = root.create_dataset('base_action', (lb, 2))
+            _ = root.create_dataset('base_action', (lb, 4))
 
             for name, array in self.ps.data_dict.items():
+                self.logger.info(name)
+                # print(array.shape())
                 root[name][...] = array
             for name, array in self.cs.data_dict.items():
                 root[name][...] = array
@@ -213,7 +218,7 @@ class puppet_gui(QMainWindow):
             for key in self.cs.data_dict:
                 self.cs.data_dict[key] = []
             for key in self.ms.data_dict:
-                self.ps.data_dict[key] = []
+                self.ms.data_dict[key] = []
             for key in self.bcs.data_dict:
                 self.cs.data_dict[key] = []
         # print(f'Saving: {time.time() - t0:.1f} secs')

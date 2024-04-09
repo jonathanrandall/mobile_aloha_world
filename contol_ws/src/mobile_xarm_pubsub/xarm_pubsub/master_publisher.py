@@ -30,6 +30,10 @@ import queue
 import time
 import numpy as np
 
+try:
+  from .my_vars import timer_period
+except:
+  from my_vars import timer_period
 
 data_queue_mp = queue.SimpleQueue()
 
@@ -62,7 +66,7 @@ class MinimalPublisher(Node):
     def __init__(self):
         super().__init__('minimal_publisher')
         self.publisher_ = self.create_publisher(sensor_msgs.msg.JointState, '/joint_states', 10)
-        timer_period = 0.75  # seconds
+        # timer_period = 0.75  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
         self.sync_data=6*[500]

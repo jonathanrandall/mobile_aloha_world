@@ -20,7 +20,10 @@ import requests
 from std_msgs.msg import Int32MultiArray
 import time
 
-
+try:
+  from .my_vars import timer_period
+except:
+  from my_vars import timer_period
 
 class BasePublisher(Node):
 
@@ -30,7 +33,7 @@ class BasePublisher(Node):
         self.declare_parameter('esp32_ip', value="http://192.168.1.211")
         self.esp32_ip = self.get_parameter('esp32_ip').value
         
-        timer_period = 0.75  # seconds
+        # timer_period = 0.75  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
         self.sync_data=6*[500]
@@ -46,9 +49,10 @@ class BasePublisher(Node):
         # msg.header.stamp = self.get_clock().now().to_msg()
         if resp:
             resp = list(map(int,((resp.content).decode('utf-8')).split()))
+            
             #return [int(raw_enc) for raw_enc in resp.split()]
         else:
-            resp = [0, 0, 0]
+            resp = [0, 0, 1, 1]
         
         msg.data = resp
         # self.get_logger().info("Wheel positions: %s" % ', '.join(str(pos) for pos in resp))

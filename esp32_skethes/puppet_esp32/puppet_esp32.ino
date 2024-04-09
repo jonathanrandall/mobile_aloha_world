@@ -4,7 +4,7 @@
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
 
-long cmd[3];
+long cmd[4];
 
 
 void setup(){
@@ -17,22 +17,24 @@ void setup(){
   start_wheel_encoder();
 
   robot_setup();
-  cmd_queue = xQueueCreate(10, sizeof(cmd));
+  cmd_queue = xQueueCreate(2, sizeof(cmd));
 
   delay(200);
 
   /****
   **** I only need these two if testing the robot without the ros2. 
   **** So, only if using the two chassis together, where the master is like a remote control
+  */
+  
   xTaskCreatePinnedToCore(
        robot_move_loop, // Function to implement the task 
        "rml",    // Name of the task 
-       1024*8,            // Stack size in words 
+       1024*16,            // Stack size in words 
        NULL,            // Task input parameter 
-       2,               // Priority of the task 
+       1,               // Priority of the task 
        NULL,     // Task handle. 
        1);              // Core where the task should run 
-  
+  /*
   xTaskCreatePinnedToCore(
        http_get_loop, // Function to implement the task 
        "ghl",    // Name of the task 
@@ -42,9 +44,11 @@ void setup(){
        NULL,     // Task handle. 
        1);              // Core where the task should run 
   */
-  /*
+  long enc2[4] = {10, 10, 0, 1};
   //this is for testing the code after flashing.
   update_speed();
+  //robot_move(enc2);
+  /*
   robot_fwd();
   delay(2000);
     Serial.print("counter 1: ");
@@ -75,7 +79,13 @@ void setup(){
 }
 
 void loop() {
-  vTaskDelete(NULL);
+  // vTaskDelete(NULL);
+  if (t_stop-millis()>900){
+    robot_stop();
+  }
+
+  delay(20);
+  // delay(10000);
   // put your main code here, to run repeatedly:
   // delay(1000);
   // String enc_vals;

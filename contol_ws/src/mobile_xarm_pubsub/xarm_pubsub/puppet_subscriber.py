@@ -26,6 +26,8 @@ import xarm
 
 from threading import Lock
 
+import random
+
 # from .record_gui import myGUI, stp_ep, strt_ep
 
 # strt_ep = 0
@@ -74,6 +76,12 @@ class MinimalSubscriber(Node):
         self.record_params = {"stop": False, "start":False}
 
         self.max_timesteps=0
+
+        self.servo_list =[]
+        for i in range(1,7):
+            self.servo_list.append(xarm.Servo(i))
+
+        self.mutex = Lock()
         
 
 
@@ -97,19 +105,36 @@ class MinimalSubscriber(Node):
         t1 = time.time()
         t0 = float(positions[6])
         # self.get_logger().info("Joint positions: %s" % ', '.join(str(pos) for pos in self.pos_prev))
+        # my_list = [0, 1, 2, 3, 4, 5]
+        my_list = list(range(1,7))
+
+        
+        # self.mutex.acquire()
+        id_pos_pairs = [[x,y] for x,y in zip(my_list, positions_int[:6])]
+        # self.pos_prev = self.robot.getPosition(self.servo_list)
+        time.sleep(0.03)
+        self.robot.setPosition(id_pos_pairs,duration=500)
+        time.sleep(0.03)
+
         for i in range(0,6):
-            self.pos_prev[i] = int(self.robot.getPosition(i+1))
+            self.pos_prev[i]=self.robot.getPosition(self.servo_list[i])
             time.sleep(0.02)
-            # self.get_logger().info(f'Joint position_{self.pos_prev[i]}')
-            pos_now = int(self.pos_prev[i])
-            # self.robot.setPosition(i+1, positions_int[i], wait=False)
-            # pos_now = int(self.robot.getPosition(i+1))
-            pos_next = positions_int[i]
-            if (abs(pos_now-pos_next)>10): #this will stop vibrations on the robot puppet arm
-                self.robot.setPosition(i+1, positions_int[i], wait=False)
-                self.pos_prev[i] = pos_next
-                # self.get_logger().info("setting positions")
-        time.sleep(0.2)
+            # self.get_logger().info(f'positions: {i}')
+        
+        # if False: #for i in range(0,6):
+        #     self.pos_prev[i] = int(self.robot.getPosition(i+1))
+        #     time.sleep(0.02)
+        #     # self.get_logger().info(f'Joint position_{self.pos_prev[i]}')
+        #     pos_now = int(self.pos_prev[i])
+        #     # self.robot.setPosition(i+1, positions_int[i], wait=False)
+        #     # pos_now = int(self.robot.getPosition(i+1))
+        #     pos_next = positions_int[i]
+        #     if (abs(pos_now-pos_next)>5): #this will stop vibrations on the robot puppet arm
+        #         self.robot.setPosition(i+1, positions_int[i], wait=False)
+        #         time.sleep(0.02)
+        #         self.pos_prev[i] = pos_next
+        #         # self.get_logger().info("setting positions")
+        time.sleep(0.02)
         t2 = time.time()
         if self.record_params["start"]:
             self.max_timesteps=self.max_timesteps+1

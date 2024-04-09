@@ -11,6 +11,7 @@ void setup() {
   Serial.begin(115200);
 
   pinMode(button_pin, INPUT_PULLUP);
+  pinMode(button_pin2, INPUT_PULLUP);
   pinMode(2, OUTPUT);
 
   digitalWrite(2, LOW);

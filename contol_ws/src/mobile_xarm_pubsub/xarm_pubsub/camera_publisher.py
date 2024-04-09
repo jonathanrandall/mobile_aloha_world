@@ -37,7 +37,7 @@ from cv_bridge import CvBridge
 import subprocess
 
 data_queue = queue.SimpleQueue()
-
+from .my_vars import timer_period
 
 stop_flag_cam=None
 
@@ -98,7 +98,7 @@ class CameraPublisher(Node):
     def __init__(self):
         super().__init__('camera_publisher')
         self.intel_publisher_rgb = self.create_publisher(Image, "rgb_frame", 10)
-        timer_period = 0.75  # seconds
+        # timer_period = 0.75  # seconds
         self.br_rgb = CvBridge()
         self.timer = self.create_timer(timer_period, self.timer_callback)
         
