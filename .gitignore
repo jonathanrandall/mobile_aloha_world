@@ -52,3 +52,14 @@ tmp*
 *.exe
 *.out
 *.app
+
+.idea
+.DS_store
+mobile-aloha/aloha.egg-info/
+mobile-aloha/aloha_scripts/.idea/
+*.png
+log*
+*/__pycache__/
+act/
+data/
+
