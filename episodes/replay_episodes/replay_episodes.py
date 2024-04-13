@@ -122,7 +122,7 @@ class ReplayEpisodes:
 
 def main(args=None):
     re = ReplayEpisodes(data_dir=data_dir)
-    for i in range(3,11):
+    for i in range(1,11):
         print(i)
         re.play_episode(i)
         # re.episode_data(i)
