@@ -82,10 +82,10 @@ void handleRequest(AsyncWebServerRequest *request)
     sscanf(valValue.c_str(), "%ld_%ld_%ld_%ld", &enc[0], &enc[1], &enc[2], &enc[3]);    
     
     
-    reset_wheel_encoder_data();
+    // reset_wheel_encoder_data();
 
     if (enc[2] && enc[3]){
-      robot_stop();
+      // robot_stop();
     } else {
         xQueueSend(cmd_queue, &enc, pdMS_TO_TICKS(10));
     }

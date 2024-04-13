@@ -206,6 +206,7 @@ class puppet_gui(QMainWindow):
                 # print(array.shape())
                 root[name][...] = array
             for name, array in self.cs.data_dict.items():
+                self.logger.info(name)
                 root[name][...] = array
             for name, array in self.ms.data_dict.items():
                 root[name][...] = array
@@ -220,7 +221,7 @@ class puppet_gui(QMainWindow):
             for key in self.ms.data_dict:
                 self.ms.data_dict[key] = []
             for key in self.bcs.data_dict:
-                self.cs.data_dict[key] = []
+                self.bcs.data_dict[key] = []
         # print(f'Saving: {time.time() - t0:.1f} secs')
 
         return True

@@ -74,10 +74,11 @@ class BaseSubscriber(Node):
 
         esp32_ip = self.esp32_ip
         try:
-            resp=requests.get(esp32_ip+f"/set_encoders?var=variable&val="+positions_str,timeout=2)
+            resp=requests.get(esp32_ip+f"/set_encoders?var=variable&val="+positions_str,timeout=2)         
         except requests.exceptions.Timeout:
             self.get_logger().info("Timed out")
-            resp="error"
+            resp.status_code = 0
+            resp.content="error"
             # exit()
 
         # print(resp.status_code)

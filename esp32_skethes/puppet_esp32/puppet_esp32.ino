@@ -18,8 +18,8 @@ void setup(){
 
   robot_setup();
   cmd_queue = xQueueCreate(5, sizeof(cmd));
-
-  delay(200);
+  Semaphore_Controls = xSemaphoreCreateMutex();
+  delay(50);
 
   /****
   **** I only need these two if testing the robot without the ros2. 

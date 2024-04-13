@@ -206,7 +206,7 @@ void robot_move_loop(void *params){
           break;
         }
       }
-      robot_stop();
+      // robot_stop();
     } else{
       robot_stop();
       reset_wheel_encoder_data();

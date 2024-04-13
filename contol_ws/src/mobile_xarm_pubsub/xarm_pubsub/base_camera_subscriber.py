@@ -73,7 +73,7 @@ class BaseCameraSubscriber(Node):
             }
         
         self.record_params = {"stop": False, "start":False}
-        self.current_frame = np.zeros((480,640, 3), dtype=np.uint8)
+        self.current_frame = np.zeros((240,320, 3), dtype=np.uint8)
         # self.current_frame = {"frame":cf}
         time.sleep(1)
         print(self.current_frame.shape)

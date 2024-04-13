@@ -1,6 +1,7 @@
 #ifndef WHEEL_ENCODER_STUFF_H_
 #define WHEEL_ENCODER_STUFF_H_
 
+SemaphoreHandle_t Semaphore_Controls = NULL;
 QueueHandle_t cmd_queue;
 
 const byte MOTOR1 = 21;  // Motor 1 Interrupt Pin - INT 0

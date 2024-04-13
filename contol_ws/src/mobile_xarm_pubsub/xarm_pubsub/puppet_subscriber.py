@@ -117,7 +117,7 @@ class MinimalSubscriber(Node):
         time.sleep(0.03)
 
         for i in range(0,6):
-            self.pos_prev[i]=self.robot.getPosition(self.servo_list[i])
+            self.pos_prev[i]=self.robot.getPosition(i+1)#self.servo_list[i])
             time.sleep(0.02)
             # self.get_logger().info(f'positions: {i}')
         
