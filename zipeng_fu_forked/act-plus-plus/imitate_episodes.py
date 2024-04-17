@@ -8,7 +8,7 @@ from copy import deepcopy
 from itertools import repeat
 from tqdm import tqdm
 from einops import rearrange
-import wandb
+# import wandb
 import time
 from torchvision import transforms
 
@@ -56,7 +56,7 @@ def main(args):
         from constants import SIM_TASK_CONFIGS
         task_config = SIM_TASK_CONFIGS[task_name]
     else:
-        from aloha_scripts.constants import TASK_CONFIGS
+        from constants_realrobot import TASK_CONFIGS
         task_config = TASK_CONFIGS[task_name]
     dataset_dir = task_config['dataset_dir']
     # num_episodes = task_config['num_episodes']
@@ -144,9 +144,9 @@ def main(args):
         os.makedirs(ckpt_dir)
     config_path = os.path.join(ckpt_dir, 'config.pkl')
     expr_name = ckpt_dir.split('/')[-1]
-    if not is_eval:
-        wandb.init(project="mobile-aloha2", reinit=True, entity="mobile-aloha2", name=expr_name)
-        wandb.config.update(config)
+    # if not is_eval:
+    #     wandb.init(project="mobile-aloha2", reinit=True, entity="mobile-aloha2", name=expr_name)
+    #     wandb.config.update(config)
     with open(config_path, 'wb') as f:
         pickle.dump(config, f)
     if is_eval:
@@ -176,7 +176,7 @@ def main(args):
     ckpt_path = os.path.join(ckpt_dir, f'policy_best.ckpt')
     torch.save(best_state_dict, ckpt_path)
     print(f'Best ckpt, val loss {min_val_loss:.6f} @ step{best_step}')
-    wandb.finish()
+    # wandb.finish()
 
 
 def make_policy(policy_class, policy_config):
@@ -295,9 +295,9 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
 
     # load environment
     if real_robot:
-        from aloha_scripts.robot_utils import move_grippers # requires aloha
-        from aloha_scripts.real_env import make_real_env # requires aloha
-        env = make_real_env(init_node=True, setup_robots=True, setup_base=True)
+        # from aloha_scripts.robot_utils import move_grippers # requires aloha
+        from modified_env import ModifiedEnv # requires aloha
+        env = ModifiedEnv() #make_real_env(init_node=True, setup_robots=True, setup_base=True)
         env_max_reward = 0
     else:
         from sim_env import make_sim_env
