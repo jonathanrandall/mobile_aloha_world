@@ -477,8 +477,8 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
 
             print(f'Avg fps {max_timesteps / (time.time() - time0)}')
             plt.close()
-        if real_robot:
-            move_grippers([env.puppet_bot_left, env.puppet_bot_right], [PUPPET_GRIPPER_JOINT_OPEN] * 2, move_time=0.5)  # open
+        if real_robot and False:
+            # move_grippers([env.puppet_bot_left, env.puppet_bot_right], [PUPPET_GRIPPER_JOINT_OPEN] * 2, move_time=0.5)  # open
             # save qpos_history_raw
             log_id = get_auto_index(ckpt_dir)
             np.save(os.path.join(ckpt_dir, f'qpos_{log_id}.npy'), qpos_history_raw)
@@ -580,7 +580,7 @@ def train_bc(train_dataloader, val_dataloader, config):
                     best_ckpt_info = (step, min_val_loss, deepcopy(policy.serialize()))
             for k in list(validation_summary.keys()):
                 validation_summary[f'val_{k}'] = validation_summary.pop(k)            
-            wandb.log(validation_summary, step=step)
+            # wandb.log(validation_summary, step=step)
             print(f'Val loss:   {epoch_val_loss:.5f}')
             summary_string = ''
             for k, v in validation_summary.items():
@@ -594,7 +594,7 @@ def train_bc(train_dataloader, val_dataloader, config):
             ckpt_path = os.path.join(ckpt_dir, ckpt_name)
             torch.save(policy.serialize(), ckpt_path)
             success, _ = eval_bc(config, ckpt_name, save_episode=True, num_rollouts=10)
-            wandb.log({'success': success}, step=step)
+            # wandb.log({'success': success}, step=step)
 
         # training
         policy.train()
@@ -605,7 +605,7 @@ def train_bc(train_dataloader, val_dataloader, config):
         loss = forward_dict['loss']
         loss.backward()
         optimizer.step()
-        wandb.log(forward_dict, step=step) # not great, make training 1-2% slower
+        # wandb.log(forward_dict, step=step) # not great, make training 1-2% slower
 
         if step % save_every == 0:
             ckpt_path = os.path.join(ckpt_dir, f'policy_step_{step}_seed_{seed}.ckpt')
