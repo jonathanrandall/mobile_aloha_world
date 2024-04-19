@@ -1,6 +1,6 @@
 ### Task parameters
 
-DATA_DIR = '/home/jonny/projects/aloha_world/episodes'
+DATA_DIR = '/home/jonny/projects/aloha_world/episodes/task1'
 TASK_CONFIGS = {
     'aloha_wear_shoe':{
         'dataset_dir': DATA_DIR + '/aloha_wear_shoe',
@@ -11,8 +11,14 @@ TASK_CONFIGS = {
     'wave_hello':{
         'dataset_dir': DATA_DIR + '/bkp_wave',
         'num_episodes': 36,
-        'episode_len': 150,
+        'episode_len': 50,
         'camera_names': ['top']
+    },
+    'task1':{
+        'dataset_dir': DATA_DIR + '/post_proc',
+        'num_episodes': 10,
+        'episode_len': 150,
+        'camera_names': ['base']
     },
 }
 
