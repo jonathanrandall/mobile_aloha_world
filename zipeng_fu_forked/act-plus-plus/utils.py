@@ -155,10 +155,11 @@ def get_norm_stats(dataset_path_list):
         try:
             with h5py.File(dataset_path, 'r') as root:
                 qpos = root['/observations/qpos'][()]
-                qvel = root['/observations/qvel'][()]
+                # qvel = root['/observations/qvel'][()]
                 if '/base_action' in root:
                     base_action = root['/base_action'][()]
                     base_action = preprocess_base_action(base_action)
+                    #we need to do some preprocessing on base action.
                     action = np.concatenate([root['/action'][()], base_action], axis=-1)
                 else:
                     action = root['/action'][()]
