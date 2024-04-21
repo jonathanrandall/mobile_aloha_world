@@ -1,6 +1,6 @@
 ### Task parameters
 
-DATA_DIR = '/home/jonny/projects/aloha_world/episodes/task1'
+DATA_DIR = '/home/jonny/projects/mobile_aloha_world/episodes/task1'
 TASK_CONFIGS = {
     'aloha_wear_shoe':{
         'dataset_dir': DATA_DIR + '/aloha_wear_shoe',

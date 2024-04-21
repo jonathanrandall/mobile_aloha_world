@@ -76,6 +76,22 @@ def load_hdf5(dataset_dir, dataset_name):
 
     return qpos, action, base_action, image_dict, is_sim
 
+def process_array(array):
+    array = array.T
+    result = np.zeros((2, array.shape[1])).astype('int32')  # Initialize result array
+    
+    # Extracting n1, n2, n3, and n4
+    n1 = array[0]
+    n2 = array[1]
+    n3 = array[2]
+    n4 = array[3]
+    
+    # Conditions
+    result[0] = np.where(n3 == 0, n1, np.where((n3 == 1) & (n4 == 1), 0, -n1))
+    result[1] = np.where(n3 == 0, n2, np.where((n3 == 1) & (n4 == 1), 0, -n2))
+    
+    return result.T
+
 def main(args):
     dataset_dir = args['dataset_dir']
     num_episodes = args['num_episodes']
@@ -94,6 +110,13 @@ def main(args):
         
         if base_action is not None:
             base_action = np.array(base_action).astype('int32') #* MIRROR_BASE_MULTIPLY
+        
+        #do my preprocessing on base action here
+        # we have n1 n2 n3 n4
+        # we want n1 n2 if n3 ==0 
+        # 00 if n3 == 1 and n4 == 1
+        # -n1 -n2 if n3 == 1 and n4 == 0
+        base_action = process_array(base_action)
 
 
         s1 = action.shape[0]
@@ -188,7 +211,7 @@ def main(args):
 
         # HDF5
         t0 = time.time()
-        dataset_path = os.path.join(dataset_dir, f'post_proc/mirror_episode_{episode_idx}')
+        dataset_path = os.path.join(dataset_dir, f'post_proc/pp_episode_{episode_idx}')
         with h5py.File(dataset_path + '.hdf5', 'w', rdcc_nbytes=1024 ** 2 * 2) as root:
             root.attrs['sim'] = is_sim
             root.attrs['compress'] = COMPRESS
@@ -205,7 +228,7 @@ def main(args):
             # qvel = obs.create_dataset('qvel', (max_timesteps, 14))
             action = root.create_dataset('action', (max_timesteps, 6))
             if base_action is not None:
-                base_action = root.create_dataset('base_action', (max_timesteps, 4))
+                base_action = root.create_dataset('base_action', (max_timesteps, base_action.shape[1]))
 
             for name, array in data_dict.items():
                 print(name)

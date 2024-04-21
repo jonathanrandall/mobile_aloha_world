@@ -7,8 +7,15 @@ from detr.main import build_ACT_model_and_optimizer, build_CNNMLP_model_and_opti
 import IPython
 e = IPython.embed
 
+import sys
+import os
+sys.path.append('./robomimic/')
+
+
+
 from collections import OrderedDict
 from robomimic.models.base_nets import ResNet18Conv, SpatialSoftmax
+
 from robomimic.algo.diffusion_policy import replace_bn_with_gn, ConditionalUnet1D
 
 

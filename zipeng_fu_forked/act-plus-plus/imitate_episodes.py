@@ -89,7 +89,7 @@ def main(args):
                          'vq': args['use_vq'],
                          'vq_class': args['vq_class'],
                          'vq_dim': args['vq_dim'],
-                         'action_dim': 16,
+                         'action_dim': 8,
                          'no_encoder': args['no_encoder'],
                          }
     elif policy_class == 'Diffusion':
@@ -163,7 +163,10 @@ def main(args):
         exit()
 
     train_dataloader, val_dataloader, stats, _ = load_data(dataset_dir, name_filter, camera_names, batch_size_train, batch_size_val, args['chunk_size'], args['skip_mirrored_data'], config['load_pretrain'], policy_class, stats_dir_l=stats_dir, sample_weights=sample_weights, train_ratio=train_ratio)
-
+    #debug here
+    # e()
+    # import pdb
+    # pdb.set_trace()
     # save dataset stats
     stats_path = os.path.join(ckpt_dir, f'dataset_stats.pkl')
     with open(stats_path, 'wb') as f:
@@ -180,6 +183,10 @@ def main(args):
 
 
 def make_policy(policy_class, policy_config):
+    #debug here
+    # e()
+    # import pdb
+    # pdb.set_trace()
     if policy_class == 'ACT':
         policy = ACTPolicy(policy_config)
     elif policy_class == 'CNNMLP':
@@ -455,6 +462,7 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
                 ### step the environment
                 time5 = time.time()
                 if real_robot:
+                    # pass
                     ts = env.step(target_qpos, base_action)
                 else:
                     ts = env.step(target_qpos)
@@ -529,6 +537,7 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
 def forward_pass(data, policy):
     image_data, qpos_data, action_data, is_pad = data
     image_data, qpos_data, action_data, is_pad = image_data.cuda(), qpos_data.cuda(), action_data.cuda(), is_pad.cuda()
+    # e()
     return policy(qpos_data, image_data, action_data, is_pad) # TODO remove None
 
 
@@ -593,7 +602,7 @@ def train_bc(train_dataloader, val_dataloader, config):
             ckpt_name = f'policy_step_{step}_seed_{seed}.ckpt'
             ckpt_path = os.path.join(ckpt_dir, ckpt_name)
             torch.save(policy.serialize(), ckpt_path)
-            success, _ = eval_bc(config, ckpt_name, save_episode=True, num_rollouts=10)
+            # success, _ = eval_bc(config, ckpt_name, save_episode=True, num_rollouts=10)
             # wandb.log({'success': success}, step=step)
 
         # training

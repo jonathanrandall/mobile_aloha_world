@@ -68,7 +68,7 @@ class EpisodicDataset(torch.utils.data.Dataset):
                 episode_len = original_action_shape[0]
                 # get observation at start_ts only
                 qpos = root['/observations/qpos'][start_ts]
-                qvel = root['/observations/qvel'][start_ts]
+                # qvel = root['/observations/qvel'][start_ts]
                 image_dict = dict()
                 for cam_name in self.camera_names:
                     image_dict[cam_name] = root[f'/observations/images/{cam_name}'][start_ts]
@@ -222,6 +222,7 @@ def load_data(dataset_dir_l, name_filter, camera_names, batch_size_train, batch_
     if type(dataset_dir_l) == str:
         dataset_dir_l = [dataset_dir_l]
     dataset_path_list_list = [find_all_hdf5(dataset_dir, skip_mirrored_data) for dataset_dir in dataset_dir_l]
+    # e()
     num_episodes_0 = len(dataset_path_list_list[0])
     dataset_path_list = flatten_list(dataset_path_list_list)
     dataset_path_list = [n for n in dataset_path_list if name_filter(n)]

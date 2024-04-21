@@ -150,7 +150,12 @@ class DETRVAE(nn.Module):
         env_state: None
         actions: batch, seq, action_dim
         """
+        #debug here
+        # e()
+        # import pdb
+        # pdb.set_trace()
         latent_input, probs, binaries, mu, logvar = self.encode(qpos, actions, is_pad, vq_sample)
+        
 
         # cvae decoder
         if self.backbones is not None:
@@ -267,7 +272,7 @@ def build_encoder(args):
 
 
 def build(args):
-    state_dim = 14 # TODO hardcode
+    state_dim = 6 # TODO hardcode
 
     # From state
     # backbone = None # from state for now, no need for conv nets
@@ -282,7 +287,8 @@ def build(args):
     if args.no_encoder:
         encoder = None
     else:
-        encoder = build_transformer(args)
+        # encoder = build_transformer(args)
+        encoder = build_encoder(args)
 
     model = DETRVAE(
         backbones,
