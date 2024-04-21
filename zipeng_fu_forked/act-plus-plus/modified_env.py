@@ -10,7 +10,7 @@ import subprocess
 from collections import deque
 import collections
 import dm_env
-
+import requests
 from xarm_pubsub.camera_publisher import find_webcam_index
 
 data_queue = deque(maxlen=30)
@@ -19,7 +19,9 @@ class ModifiedEnv:
     def __init__(self) -> None:
         self.data_queue = deque(maxlen=30)
         self.robot_state=6*[500]
-        
+        self.base_action = [0,0,1,1]
+        self.pos_str = '_'.join(str(int(pos)) for pos in self.base_action)
+        self.esp32 = "http://192.168.1.182"
         
         self.robot = self.connect_to_robot()
         
@@ -49,15 +51,28 @@ class ModifiedEnv:
     
     def set_robot_state(self, rs=None):
         wa = False
+        # try:
+        #     resp=requests.get(self.esp32+f"/set_encoders?var=variable&val="+self.pos_str,timeout=2)
+        # except requests.exceptions.Timeout:
+        #     # resp=requests.get(self.esp32+f"/set_encoders?var=variable&val=0_0_0_0")
+        #     pass
         for i in range(0,6):
             # wa = True if i == 5 else False
             if rs is not None:
-                self.robot.setPosition(i+1, rs[i], wait=wa)
+                self.robot.setPosition(i+1, rs[i], wait=wa, duration=500)
             else:
-                self.robot.setPosition(i+1, self.robot_state[i], wait=wa)
+                # print(self.robot_state[i])
+                if self.robot_state[i] <1.0:
+                    self.robot_state[i] = 1
+                self.robot.setPosition(i+1, int(self.robot_state[i]), wait=wa, duration=500)
             
-    def step(self, action):
+    def step(self, action, base_action = None):
         self.robot_state = action
+        if base_action is not None:
+            self.base_action = base_action + [0 if base_action[0] > 0 else 1, 0 if base_action[0]<0 else 1]
+        else:
+            self.base_action = [0,0,1,1]
+        self.pos_str = '_'.join(str(int(pos)) for pos in self.base_action)
         self.set_robot_state()
         time.sleep(0.02)
         return dm_env.TimeStep(
@@ -78,37 +93,40 @@ class ModifiedEnv:
 
     def get_images(self):
         image_dict = dict()
-        image_dict['top'] = data_queue.pop()
+        image_dict['base'] = data_queue.pop()
         return image_dict
 
     def read_camera(self, dq):
         global stop_flag_cam
         stop_flag_cam = threading.Event()
 
-        webcam_name = "C922 Pro Stream Webcam (usb-0000:00:14.0-4):"
+        # webcam_name = "C922 Pro Stream Webcam (usb-0000:00:14.0-4):"
 
-    # Find the index of the webcam
-        webcam_index = int(find_webcam_index(webcam_name))
+        # Find the index of the webcam
+        # webcam_index = int(find_webcam_index(webcam_name))
+        URL_cam = "http://192.168.1.181"
 
-        cap = cv2.VideoCapture(webcam_index)
+        cap = cv2.VideoCapture(URL_cam + ":81/stream")
 
-    # Check if the webcam is opened successfully
+        # Check if the webcam is opened successfully
         if not cap.isOpened():
             print("Error: Cannot open webcam")
             exit()
 
-        width = 640
-        height = 480
+        
+        # width = 640
+        # height = 480
 
-        # Set the resolution
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+        # # Set the resolution
+        # cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+        # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
         while not stop_flag_cam.is_set():
             ret, frame = cap.read()
             if not ret:
                 print('failed to grab image')
                 break
+            frame = cv2.resize(frame, (640, 480))
             dq.append(frame)
             cv2.imshow("RGB", frame)
             cv2.waitKey(1)

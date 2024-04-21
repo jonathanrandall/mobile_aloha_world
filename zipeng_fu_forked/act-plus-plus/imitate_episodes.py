@@ -270,6 +270,8 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
     stats_path = os.path.join(ckpt_dir, f'dataset_stats.pkl')
     with open(stats_path, 'rb') as f:
         stats = pickle.load(f)
+    # print(stats)
+    # return
     # if use_actuator_net:
     #     prediction_len = actuator_config['prediction_len']
     #     future_len = actuator_config['future_len']
@@ -306,6 +308,7 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
         from modified_env import ModifiedEnv # requires aloha
         env = ModifiedEnv() #make_real_env(init_node=True, setup_robots=True, setup_base=True)
         env_max_reward = 0
+        time.sleep(2)
     else:
         from sim_env import make_sim_env
         env = make_sim_env(task_name)
@@ -323,9 +326,11 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
 
     episode_returns = []
     highest_rewards = []
+    num_rollouts=1
     for rollout_id in range(num_rollouts):
         if real_robot:
-            e()
+            pass
+            # e()
         rollout_id += 0
         ### set task
         if 'sim_transfer_cube' in task_name:
@@ -441,6 +446,7 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
                 ### post-process actions
                 time4 = time.time()
                 raw_action = raw_action.squeeze(0).cpu().numpy()
+                print(raw_action)
                 action = post_process(raw_action)
                 target_qpos = action[:-2]
 
@@ -463,6 +469,7 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
                 time5 = time.time()
                 if real_robot:
                     # pass
+                    print(base_action)
                     ts = env.step(target_qpos, base_action)
                 else:
                     ts = env.step(target_qpos)
@@ -477,7 +484,7 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
                 # print(sleep_time)
                 time.sleep(sleep_time)
                 # time.sleep(max(0, DT - duration - culmulated_delay))
-                if duration >= DT:
+                if False and duration >= DT:
                     culmulated_delay += (duration - DT)
                     print(f'Warning: step duration: {duration:.3f} s at step {t} longer than DT: {DT} s, culmulated delay: {culmulated_delay:.3f} s')
                 # else:
