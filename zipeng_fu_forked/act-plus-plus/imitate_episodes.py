@@ -248,7 +248,7 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
     vq = config['policy_config']['vq']
     actuator_config = config['actuator_config']
     use_actuator_net = actuator_config['actuator_network_dir'] is not None
-
+    # temporal_agg=True
     # load policy and stats
     ckpt_path = os.path.join(ckpt_dir, ckpt_name)
     policy = make_policy(policy_class, policy_config)
@@ -348,7 +348,7 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
 
         ### evaluation loop
         if temporal_agg:
-            all_time_actions = torch.zeros([max_timesteps, max_timesteps+num_queries, 16]).cuda()
+            all_time_actions = torch.zeros([max_timesteps, max_timesteps+num_queries, 8]).cuda()
 
         # qpos_history = torch.zeros((1, max_timesteps, state_dim)).cuda()
         qpos_history_raw = np.zeros((max_timesteps, state_dim))
@@ -360,6 +360,7 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
         #     norm_episode_all_base_actions = [actuator_norm(np.zeros(history_len, 2)).tolist()]
         with torch.inference_mode():
             time0 = time.time()
+            time.sleep(0.5)
             DT = 1 / FPS
             culmulated_delay = 0 
             for t in range(max_timesteps):
@@ -396,6 +397,10 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
                 ### query policy
                 time3 = time.time()
                 if config['policy_class'] == "ACT":
+                    #debug here
+                    # e()
+                    # import pdb
+                    # pdb.set_trace()
                     if t % query_frequency == 0:
                         if vq:
                             if rollout_id == 0:
@@ -412,7 +417,8 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
                         if real_robot:
                             all_actions = torch.cat([all_actions[:, :-BASE_DELAY, :-2], all_actions[:, BASE_DELAY:, -2:]], dim=2)
                     if temporal_agg:
-                        all_time_actions[[t], t:t+num_queries] = all_actions
+                        # e()
+                        all_time_actions[[t], t:t+num_queries-BASE_DELAY] = all_actions
                         actions_for_curr_step = all_time_actions[:, t]
                         actions_populated = torch.all(actions_for_curr_step != 0, axis=1)
                         actions_for_curr_step = actions_for_curr_step[actions_populated]

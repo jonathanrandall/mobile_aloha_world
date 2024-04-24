@@ -136,12 +136,13 @@ class ModifiedEnv:
 def main(args=None):
     t1 = ModifiedEnv()
     time.sleep(1)
-    t1.plonkal()
+    # t1.plonkal()
     # while True:
     #     img_d=t1.get_images()
     #     print(img_d['top'].size)
-    time.sleep(2)
+    # time.sleep(2)
     ts = t1.reset()
+    return
     # print(ts.observation)
 
 

@@ -88,6 +88,7 @@ class EpisodicDataset(torch.utils.data.Dataset):
 
             # self.is_sim = is_sim
             padded_action = np.zeros((self.max_episode_len, original_action_shape[1]), dtype=np.float32)
+            padded_action.fill(500.0)
             padded_action[:action_len] = action
             is_pad = np.zeros(self.max_episode_len)
             is_pad[action_len:] = 1

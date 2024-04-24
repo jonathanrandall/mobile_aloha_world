@@ -1,4 +1,4 @@
-python3 imitate_episodes.py --task_name task1 --ckpt_dir '/home/jonny/projects/mobile_aloha_world/episodes/ckpt_dir' --policy_class ACT --kl_weight 10 --chunk_size 150 --hidden_dim 512 --num_steps 4000 --batch_size 4 --seed 42 --lr 1e-5 --dim_feedforward 512
+python3 imitate_episodes.py --task_name task1 --ckpt_dir '/home/jonny/projects/mobile_aloha_world/episodes/ckpt_dir' --policy_class ACT --kl_weight 10 --chunk_size 50 --hidden_dim 512 --num_steps 4000 --batch_size 4 --seed 42 --lr 1e-5 --dim_feedforward 512
 
 
 python3 act/imitate_episodes.py --task_name wave_hello --ckpt_dir '/home/jonny/projects/aloha_world/ckpt_dir_3' --policy_class ACT --kl_weight 10 --chunk_size 50 --hidden_dim 512 --num_epochs 7000 --batch_size 16 --seed 42 --lr 1e-5 --dim_feedforward 512 --eval
